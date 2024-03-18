@@ -56,7 +56,6 @@ void LibcameraApp::OpenCamera()
 
 	if (options_->verbose)
 		std::cerr << "Acquired camera " << cam_id << std::endl;
-
 }
 
 void LibcameraApp::CloseCamera()
@@ -80,7 +79,7 @@ void LibcameraApp::ConfigureStill(unsigned int flags)
 
 	// Always request a raw stream as this forces the full resolution capture mode.
 	// (options_->mode can override the choice of camera mode, however.)
-	StreamRoles stream_roles = { StreamRole::StillCapture, StreamRole::Raw };
+	StreamRoles stream_roles = {StreamRole::StillCapture, StreamRole::Raw};
 	configuration_ = camera_->generateConfiguration(stream_roles);
 	if (!configuration_)
 		throw std::runtime_error("failed to generate still capture configuration");
@@ -96,14 +95,14 @@ void LibcameraApp::ConfigureStill(unsigned int flags)
 		configuration_->at(0).bufferCount = 2;
 	else if ((flags & FLAG_STILL_BUFFER_MASK) == FLAG_STILL_TRIPLE_BUFFER)
 		configuration_->at(0).bufferCount = 3;
-    if (options_->photo_width)
-        configuration_->at(0).size.width = options_->photo_width;
-    if (options_->photo_height)
-        configuration_->at(0).size.height = options_->photo_height;
+	if (options_->photo_width)
+		configuration_->at(0).size.width = options_->photo_width;
+	if (options_->photo_height)
+		configuration_->at(0).size.height = options_->photo_height;
 
-//    configuration_->transform = options_->transform;
+	//    configuration_->transform = options_->transform;
 
-	//if (have_raw_stream && !options_->rawfull)
+	// if (have_raw_stream && !options_->rawfull)
 	{
 		configuration_->at(1).size.width = configuration_->at(0).size.width;
 		configuration_->at(1).size.height = configuration_->at(0).size.height;
@@ -122,29 +121,29 @@ void LibcameraApp::ConfigureStill(unsigned int flags)
 
 void LibcameraApp::ConfigureViewfinder()
 {
-    if (options_->verbose)
-        std::cerr << "Configuring viewfinder..." << std::endl;
+	if (options_->verbose)
+		std::cerr << "Configuring viewfinder..." << std::endl;
 
-    StreamRoles stream_roles = { StreamRole::Viewfinder };
-    configuration_ = camera_->generateConfiguration(stream_roles);
-    if (!configuration_)
-        throw std::runtime_error("failed to generate viewfinder configuration");
+	StreamRoles stream_roles = {StreamRole::Viewfinder};
+	configuration_ = camera_->generateConfiguration(stream_roles);
+	if (!configuration_)
+		throw std::runtime_error("failed to generate viewfinder configuration");
 
-    // Now we get to override any of the default settings from the options_->
-    configuration_->at(0).pixelFormat = libcamera::formats::RGB888;
-    configuration_->at(0).size.width = options_->video_width;
-    configuration_->at(0).size.height = options_->video_height;
-    configuration_->at(0).bufferCount = 4;
+	// Now we get to override any of the default settings from the options_->
+	configuration_->at(0).pixelFormat = libcamera::formats::RGB888;
+	configuration_->at(0).size.width = options_->video_width;
+	configuration_->at(0).size.height = options_->video_height;
+	configuration_->at(0).bufferCount = 4;
 
-//    configuration_->transform = options_->transform;
+	//    configuration_->transform = options_->transform;
 
-    configureDenoise(options_->denoise == "auto" ? "cdn_off" : options_->denoise);
-    setupCapture();
+	configureDenoise(options_->denoise == "auto" ? "cdn_off" : options_->denoise);
+	setupCapture();
 
-    streams_["viewfinder"] = configuration_->at(0).stream();
+	streams_["viewfinder"] = configuration_->at(0).stream();
 
-    if (options_->verbose)
-        std::cerr << "Viewfinder setup complete" << std::endl;
+	if (options_->verbose)
+		std::cerr << "Viewfinder setup complete" << std::endl;
 }
 
 void LibcameraApp::Teardown()
@@ -198,11 +197,11 @@ void LibcameraApp::StartCamera()
 	if (!controls_.get(controls::FrameDurationLimits))
 	{
 		if (StillStream())
-			controls_.set(controls::FrameDurationLimits, libcamera::Span<const int64_t, 2>({ INT64_C(100), INT64_C(1000000000) }));
+			controls_.set(controls::FrameDurationLimits, libcamera::Span<const int64_t, 2>({INT64_C(100), INT64_C(1000000000)}));
 		else if (options_->framerate > 0)
 		{
 			int64_t frame_time = 1000000 / options_->framerate; // in us
-			controls_.set(controls::FrameDurationLimits, libcamera::Span<const int64_t, 2>({ frame_time, frame_time }));
+			controls_.set(controls::FrameDurationLimits, libcamera::Span<const int64_t, 2>({frame_time, frame_time}));
 		}
 	}
 
@@ -219,7 +218,9 @@ void LibcameraApp::StartCamera()
 	if (!controls_.get(controls::AwbMode))
 		controls_.set(controls::AwbMode, options_->getWhiteBalance());
 	if (!controls_.get(controls::ColourGains) && options_->awb_gain_r && options_->awb_gain_b)
-		controls_.set(controls::ColourGains, libcamera::Span<const float, 2>({ options_->awb_gain_r, options_->awb_gain_b }));
+		controls_.set(controls::ColourGains, libcamera::Span<const float, 2>({options_->awb_gain_r, options_->awb_gain_b}));
+	if (!controls_.get(controls::AfMode))
+		controls_.set(controls::AfMode, options_->getAutoFocus());
 	if (!controls_.get(controls::Brightness))
 		controls_.set(controls::Brightness, options_->brightness);
 	if (!controls_.get(controls::Contrast))
@@ -281,20 +282,21 @@ void LibcameraApp::StopCamera()
 		std::cerr << "Camera stopped!" << std::endl;
 }
 
-void LibcameraApp::ApplyRoiSettings(){
-    if (!controls_.get(controls::ScalerCrop) && options_->roi_width != 0 && options_->roi_height != 0)
-    {
-        Rectangle sensor_area = *camera_->properties().get(properties::ScalerCropMaximum);
-        int x = options_->roi_x * sensor_area.width;
-        int y = options_->roi_y * sensor_area.height;
-        int w = options_->roi_width * sensor_area.width;
-        int h = options_->roi_height * sensor_area.height;
-        Rectangle crop(x, y, w, h);
-        crop.translateBy(sensor_area.topLeft());
-        if (options_->verbose)
-            std::cerr << "Using crop " << crop.toString() << std::endl;
-        controls_.set(controls::ScalerCrop, crop);
-    }
+void LibcameraApp::ApplyRoiSettings()
+{
+	if (!controls_.get(controls::ScalerCrop) && options_->roi_width != 0 && options_->roi_height != 0)
+	{
+		Rectangle sensor_area = *camera_->properties().get(properties::ScalerCropMaximum);
+		int x = options_->roi_x * sensor_area.width;
+		int y = options_->roi_y * sensor_area.height;
+		int w = options_->roi_width * sensor_area.width;
+		int h = options_->roi_height * sensor_area.height;
+		Rectangle crop(x, y, w, h);
+		crop.translateBy(sensor_area.topLeft());
+		if (options_->verbose)
+			std::cerr << "Using crop " << crop.toString() << std::endl;
+		controls_.set(controls::ScalerCrop, crop);
+	}
 }
 
 LibcameraApp::Msg LibcameraApp::Wait()
@@ -320,7 +322,7 @@ void LibcameraApp::queueRequest(CompletedRequest *completed_request)
 	{
 		std::lock_guard<std::mutex> lock(completed_requests_mutex_);
 		auto it = completed_requests_.find(completed_request);
-        delete completed_request;
+		delete completed_request;
 		if (it == completed_requests_.end())
 			return;
 		completed_requests_.erase(it);
@@ -506,7 +508,8 @@ void LibcameraApp::requestComplete(Request *request)
 		return;
 
 	CompletedRequest *r = new CompletedRequest(sequence_++, request);
-	CompletedRequestPtr payload(r, [this](CompletedRequest *cr) { this->queueRequest(cr); });
+	CompletedRequestPtr payload(r, [this](CompletedRequest *cr)
+								{ this->queueRequest(cr); });
 	{
 		std::lock_guard<std::mutex> lock(completed_requests_mutex_);
 		completed_requests_.insert(r);
@@ -520,7 +523,7 @@ void LibcameraApp::requestComplete(Request *request)
 		payload->framerate = 1e9 / (timestamp - last_timestamp_);
 	last_timestamp_ = timestamp;
 
-    msg_queue_.Post(Msg(MsgType::RequestComplete, std::move(payload)));
+	msg_queue_.Post(Msg(MsgType::RequestComplete, std::move(payload)));
 }
 
 void LibcameraApp::configureDenoise(const std::string &denoise_mode)
@@ -528,11 +531,10 @@ void LibcameraApp::configureDenoise(const std::string &denoise_mode)
 	using namespace libcamera::controls::draft;
 
 	static const std::map<std::string, NoiseReductionModeEnum> denoise_table = {
-		{ "off", NoiseReductionModeOff },
-		{ "cdn_off", NoiseReductionModeMinimal },
-		{ "cdn_fast", NoiseReductionModeFast },
-		{ "cdn_hq", NoiseReductionModeHighQuality }
-	};
+		{"off", NoiseReductionModeOff},
+		{"cdn_off", NoiseReductionModeMinimal},
+		{"cdn_fast", NoiseReductionModeFast},
+		{"cdn_hq", NoiseReductionModeHighQuality}};
 	NoiseReductionModeEnum denoise;
 
 	auto const mode = denoise_table.find(denoise_mode);
