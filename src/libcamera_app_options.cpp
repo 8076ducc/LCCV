@@ -30,6 +30,8 @@ void Options::Print() const
 	std::cerr << "    awb: " << awb_index << std::endl;
 	if (awb_gain_r && awb_gain_b)
 		std::cerr << "    awb gains: red " << awb_gain_r << " blue " << awb_gain_b << std::endl;
+	std::cerr << "    autofocus: " << af_index << std::endl;
+	std::cerr << "    lens position: " << libcamera::controls::LensPosition << std::endl;
 	std::cerr << "    brightness: " << brightness << std::endl;
 	std::cerr << "    contrast: " << contrast << std::endl;
 	std::cerr << "    saturation: " << saturation << std::endl;

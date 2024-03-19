@@ -61,6 +61,7 @@ public:
 		exposure_index = Exposure_Modes::EXPOSURE_NORMAL;
 		awb_index = WhiteBalance_Modes::WB_AUTO;
 		af_index = AutoFocus_Modes::AF_CONTINUOUS;
+		libcamera::controls::LensPosition = 20;
 		saturation = 1.0f;
 		contrast = 1.0f;
 		sharpness = 1.0f;
@@ -84,11 +85,13 @@ public:
 	void setWhiteBalance(WhiteBalance_Modes wb) { awb_index = wb; }
 	void setExposureMode(Exposure_Modes exp) { exposure_index = exp; }
 	void setAutoFocus(AutoFocus_Modes af) { af_index = af; }
+	void setLensPosition(float lens) { libcamera::controls::LensPosition = lens; }
 
 	int getExposureMode() { return exposure_index; }
 	int getMeteringMode() { return metering_index; }
 	int getWhiteBalance() { return awb_index; }
 	int getAutoFocus() { return af_index; }
+	float getLensPosition() { return libcamera::controls::LensPosition; }
 
 	bool help;
 	bool version;
@@ -118,6 +121,7 @@ protected:
 	int metering_index;
 	int exposure_index;
 	int awb_index;
+	int af_index;
 
 private:
 };
