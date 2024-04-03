@@ -222,7 +222,7 @@ void LibcameraApp::StartCamera()
 	if (!controls_.get(controls::AfMode))
 		controls_.set(controls::AfMode, options_->getAutoFocus());
 	if (!controls_.get(controls::LensPosition))
-		controls_.set(controls::LensPosition, options_->getLensPosition());
+		controls_.set(controls::LensPosition, options_->lens_position);
 	if (!controls_.get(controls::Brightness))
 		controls_.set(controls::Brightness, options_->brightness);
 	if (!controls_.get(controls::Contrast))
