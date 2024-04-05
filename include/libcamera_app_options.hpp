@@ -106,6 +106,7 @@ public:
 	float ev;
 	float awb_gain_r;
 	float awb_gain_b;
+	float lens_position;
 	float brightness;
 	float contrast;
 	float saturation;
