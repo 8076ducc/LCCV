@@ -40,7 +40,7 @@ Install everything using the following command:
 Building and installing
 -----------------------
 
-    git clone https://github.com/kbarni/LCCV.git
+    git clone https://github.com/8076ducc/LCCV.git
     cd LCCV
     mkdir build
     cd build
