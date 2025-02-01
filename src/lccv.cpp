@@ -20,8 +20,8 @@ PiCamera::PiCamera()
     options->setMetering(Metering_Modes::METERING_MATRIX);
     options->setExposureMode(Exposure_Modes::EXPOSURE_NORMAL);
     options->setWhiteBalance(WhiteBalance_Modes::WB_AUTO);
-    options->setAutoFocus(AutoFocus_Modes::AF_CONTINUOUS);
-    options->lens_position = 20.0f;
+    options->setAutoFocus(AutoFocus_Modes::AF_MANUAL);
+    options->lens_position = 10.0f;
     options->contrast = 1.0f;
     options->saturation = 1.0f;
     still_flags |= LibcameraApp::FLAG_STILL_RGB;

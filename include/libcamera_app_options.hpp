@@ -60,8 +60,8 @@ public:
 		metering_index = Metering_Modes::METERING_CENTRE;
 		exposure_index = Exposure_Modes::EXPOSURE_NORMAL;
 		awb_index = WhiteBalance_Modes::WB_AUTO;
-		af_index = AutoFocus_Modes::AF_CONTINUOUS;
-		lens_position = 20.0f;
+		af_index = AutoFocus_Modes::AF_MANUAL;
+		lens_position = 10.0f;
 		saturation = 1.0f;
 		contrast = 1.0f;
 		sharpness = 1.0f;
